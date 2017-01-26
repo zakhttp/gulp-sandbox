@@ -20,6 +20,7 @@ module.exports = function() {
         client: client,
         css: temp + 'styles.css',
         fonts: './bower_components/font-awesome/fonts/**/*.*',
+        html: clientApp + '**/*.html',
         htmlTemplates: clientApp + '**/*.html',
         images: client + 'images/**/*.*',
         index: client + 'index.html',
