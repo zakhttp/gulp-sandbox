@@ -11,6 +11,8 @@
         gulp-nodemon
         gulp-task-listing
         gulp-imagemin
+        gulp-minify-html
+        gulp-angular-templatecache
 
 */
 
@@ -80,8 +82,25 @@ gulp.task('clean-images', function(done) {
     clean(config.build + 'images/', done);
 });
 
+gulp.task('clean-code', function(done) {
+    var codeFiles = [].concat(
+        config.temp + '**/*.js',
+        config.build + '**.*.html',
+        config.build + 'js/**/*.js'
+    );
+    clean(codeFiles, done);
+});
+
 gulp.task('less-watcher', function() {
     gulp.watch(config.less, ['styles']);
+});
+
+gulp.task('template-cache', ['clean-code'], function() {
+    log('Creating AngularJS $templateCache');
+    return gulp.src(config.htmlTemplates)
+        .pipe($.minifyHtml({empty: true}))
+        .pipe($.angularTemplatecache(config.templateCache.file, config.templateCache.options))
+        .pipe(gulp.dest(config.temp));
 });
 
 gulp.task('wiredep', function() {

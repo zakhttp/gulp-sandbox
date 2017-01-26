@@ -20,6 +20,7 @@ module.exports = function() {
         client: client,
         css: temp + 'styles.css',
         fonts: './bower_components/font-awesome/fonts/**/*.*',
+        htmlTemplates: clientApp + '**/*.html',
         images: client + 'images/**/*.*',
         index: client + 'index.html',
         js: [
@@ -30,6 +31,18 @@ module.exports = function() {
         less: client + 'styles/styles.less',
         server: server,
         temp: temp,
+
+        /**
+         * Template cache
+         */
+        templateCache: {
+            file: 'templates.js',
+            options: {
+                module: 'app.core',
+                standAlone: false,
+                root: 'app/'
+            }
+        },
 
         /**
          * BroswerSync
