@@ -17,6 +17,7 @@ var gulp = require('gulp'),
     args = require('yargs').argv,
     del = require('del'),
     wiredep = require('wiredep').stream,
+    browserSync = require('browser-sync'),
     $ = require('gulp-load-plugins')({lazy: true}),
     port = process.env.PORT || config.defaultPort;
 
@@ -88,9 +89,14 @@ gulp.task('serve-dev', ['inject'], function() {
         .on('restart', ['vet'], function(ev) {
             log('*** nodemon restarted');
             log('files changed are: \n' + ev);
+            setTimeout(function() {
+                browserSync.notify('reloading now ...');
+                browserSync.reload({stream: false});
+            }, config.browserReloadDelay);
         })
         .on('start', function() {
             log('*** nodemon started');
+            startBrowserSync();
 
         })
         .on('crash', function() {
@@ -102,6 +108,44 @@ gulp.task('serve-dev', ['inject'], function() {
 
         });
 });
+/////////////
+function changeEvent(event) {
+    var srcPattern = new RegExp('/.*(?=/' + config.source + ')/');
+    log('File ' + event.path.replace(srcPattern, '') + ' ' + event.type);
+}
+
+function startBrowserSync() {
+    if (args.nosync || browserSync.active) {
+        return;
+    }
+    log('starting broswer-sync on port: ' + port);
+    gulp.watch([config.less], ['styles'])
+        .on('change', function(event) {
+            changeEvent(event);
+        });
+    var options = {
+        proxy: 'localhost:' + port,
+        port: 3000,
+        files: [
+            config.client + '**/*.*',
+            '!' + config.less,
+            config.temp + '**/*.css'
+        ],
+        ghostMode: {
+            clicks: true,
+            location: true,
+            forms: true,
+            scroll: true
+        },
+        injectChanges: true,
+        logFileChanges: true,
+        logLevel: 'debug',
+        logPrefix: 'gulp',
+        notify: true,
+        reloadDelay: 0 //1000
+    };
+    browserSync(options);
+}
 
 function clean(path, done) {
     log('Cleaning assets: ' + $.util.colors.blue(path));

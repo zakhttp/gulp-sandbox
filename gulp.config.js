@@ -5,9 +5,11 @@ module.exports = function() {
         temp = './.tmp/';
 
     var config = {
+
         /**
          * Files paths
          */
+
         // All the js to vet
         alljs: [
             './src/**/*.js',
@@ -25,6 +27,11 @@ module.exports = function() {
         less: client + 'styles/styles.less',
         server: server,
         temp: temp,
+
+        /**
+         * BroswerSync
+         */
+        browserReloadDelay: 1000,
 
         /**
          * Bower and NPM locations
