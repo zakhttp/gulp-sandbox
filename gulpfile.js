@@ -9,6 +9,8 @@
         gulp-autoprefixer
         gulp-inject
         gulp-nodemon
+        gulp-task-listing
+        gulp-imagemin
 
 */
 
@@ -20,6 +22,9 @@ var gulp = require('gulp'),
     browserSync = require('browser-sync'),
     $ = require('gulp-load-plugins')({lazy: true}),
     port = process.env.PORT || config.defaultPort;
+
+gulp.task('help', $.taskListing); // TODO segregates tasks
+gulp.task('default', ['help']);
 
 gulp.task('vet', function() {
     log('Analyzing source with JSHint and JSCS');
@@ -44,9 +49,35 @@ gulp.task('styles', ['clean-styles'], function() {
         .pipe(gulp.dest(config.temp));
 });
 
+gulp.task('fonts', ['clean-fonts'], function() {
+    log('Copying fonts');
+    return gulp.src(config.fonts)
+        .pipe(gulp.dest(config.build + 'fonts'));
+});
+
+gulp.task('images', ['clean-images'], function() {
+    log('Copying and compressing the  images');
+    return gulp.src(config.images)
+        .pipe($.imagemin({optimizationLevel: 4, verbose: args.verbose ? true : false}))
+        .pipe(gulp.dest(config.build + 'images'));
+});
+
+gulp.task('clean', function(done) {
+    var delConfig = [].concat(config.build, config.temp);
+    log('Cleaning: ' + $.util.colors.blue(delConfig));
+    clean(delConfig, done);
+});
+
 gulp.task('clean-styles', function(done) {
-    var files = config.temp + '**/*.css';
-    clean(files, done);
+    clean(config.temp + '**/*.css', done);
+});
+
+gulp.task('clean-fonts', function(done) {
+    clean(config.build + 'fonts/', done);
+});
+
+gulp.task('clean-images', function(done) {
+    clean(config.build + 'images/', done);
 });
 
 gulp.task('less-watcher', function() {
