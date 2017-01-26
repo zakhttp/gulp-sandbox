@@ -8,7 +8,7 @@
         gulp-less
         gulp-autoprefixer
         gulp-inject
-        gulp-angular-filesort
+        gulp-nodemon
 
 */
 
@@ -17,7 +17,8 @@ var gulp = require('gulp'),
     args = require('yargs').argv,
     del = require('del'),
     wiredep = require('wiredep').stream,
-    $ = require('gulp-load-plugins')({ lazy: true });
+    $ = require('gulp-load-plugins')({lazy: true}),
+    port = process.env.PORT || config.defaultPort;
 
 gulp.task('vet', function() {
     log('Analyzing source with JSHint and JSCS');
@@ -26,7 +27,7 @@ gulp.task('vet', function() {
         .pipe($.if(args.verbose, $.print()))
         // .pipe($.jscs())
         .pipe($.jshint())
-        .pipe($.jshint.reporter('jshint-stylish', { verbose: true }))
+        .pipe($.jshint.reporter('jshint-stylish', {verbose: true}))
         .pipe($.jshint.reporter('fail'));
 
 });
@@ -38,7 +39,7 @@ gulp.task('styles', ['clean-styles'], function() {
         .pipe($.plumber())
         .pipe($.less())
         // .on('error', errorLogger)
-        .pipe($.autoprefixer({ browsers: ['last 2 version', '> 5%'] }))
+        .pipe($.autoprefixer({browsers: ['last 2 version', '> 5%']}))
         .pipe(gulp.dest(config.temp));
 });
 
@@ -71,13 +72,36 @@ gulp.task('inject', ['wiredep', 'styles'], function() {
         .pipe(gulp.dest(config.client));
 });
 
-////////
-function errorLogger(error) {
-    log('*** Start of Error');
-    log(error);
-    log('*** End of Error');
-    this.emit('end');
-}
+gulp.task('serve-dev', ['inject'], function() {
+    var isDev = true;
+    var nodeOptions = {
+        script: config.nodeServer,
+        delayTime: 1,
+        env: {
+            'PORT': port,
+            'NODE_ENV': isDev ? 'dev' : 'build'
+        },
+        watch: [config.server] // TODO dfines files to restart on
+
+    };
+    return $.nodemon(nodeOptions)
+        .on('restart', ['vet'], function(ev) {
+            log('*** nodemon restarted');
+            log('files changed are: \n' + ev);
+        })
+        .on('start', function() {
+            log('*** nodemon started');
+
+        })
+        .on('crash', function() {
+            log('*** nodemon crashed: script crashed form some reason');
+
+        })
+        .on('exit', function() {
+            log('*** nodemon exited cleanly');
+
+        });
+});
 
 function clean(path, done) {
     log('Cleaning assets: ' + $.util.colors.blue(path));
