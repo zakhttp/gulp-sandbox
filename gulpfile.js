@@ -14,6 +14,9 @@
         gulp-minify-html
         gulp-angular-templatecache
         gulp-useref
+        gulp-csso
+        gulp-uglify
+        gulp-filter
 
 */
 
@@ -124,16 +127,25 @@ gulp.task('inject', ['wiredep', 'styles', 'template-cache'], function() {
         .pipe(gulp.dest(config.client));
 });
 
-gulp.task('optimize', ['inject'], function() {
+gulp.task('optimize', ['inject', 'fonts', 'images'], function() {
     log('Optimizing the javascript, CSS & HTML');
     var assets = $.useref({ searchPath: './' });
     var templateCache = config.temp + config.templateCache.file;
+    var cssFilter = $.filter(['**/*.css'], { restore: true });
+    var jsFilter = $.filter(['**/*.js'], { restore: true });
+
     return gulp.src(config.index)
         .pipe($.plumber())
         .pipe($.inject(gulp.src(templateCache, { read: false }), {
             starttag: '<!-- inject:template:js -->'
         }))
         .pipe(assets)
+        .pipe(cssFilter)
+        .pipe($.csso())
+        .pipe(cssFilter.restore)
+        .pipe(jsFilter)
+        .pipe($.uglify())
+        .pipe(jsFilter.restore)
         .pipe(gulp.dest(config.build));
 });
 gulp.task('serve-build', ['optimize'], function() {
