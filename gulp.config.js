@@ -2,7 +2,13 @@ module.exports = function() {
     var client = './src/client/',
         clientApp = client + 'app/',
         server = './src/server/',
-        temp = './.tmp/';
+        temp = './.tmp/',
+        root = './',
+        report = './report/',
+        wiredep = require('wiredep'),
+        bowerFiles = wiredep({
+            devDependencies: true
+        })['js'];
 
     var config = {
 
@@ -30,8 +36,18 @@ module.exports = function() {
             '!' + clientApp + '**/*.spec.js'
         ],
         less: client + 'styles/styles.less',
+        report: report,
+        root: root,
         server: server,
         temp: temp,
+
+        /**
+         * Optimized files
+         */
+        optimized: {
+            app: 'app.js',
+            lib: 'lib.js'
+        },
 
         /**
          * Template cache
@@ -58,6 +74,17 @@ module.exports = function() {
             directory: './bower_components/',
             ignorePath: '../..'
         },
+        packages: [
+            './package.json',
+            './bower.json'
+        ],
+
+        /**
+         * Karma & testing Settings
+         */
+        specHelpers: [client + 'test-helpers/*.js'],
+        serverIntegrationSpecs: [client + 'tests/server-integration/**/*.spec.js'],
+
         /**
          * Node Settings
          */
@@ -74,5 +101,42 @@ module.exports = function() {
         return options;
     };
 
+    config.karma = getKarmaOptions();
+
     return config;
+
+    //////////////
+
+    function getKarmaOptions() {
+        var options = {
+            files: [].concat(
+                bowerFiles,
+                config.specHelpers,
+                client + '**/*.module.js',
+                clientApp + '**/*.js',
+                temp + config.templateCache.file,
+                config.serverIntegrationSpecs
+            ),
+            exclude: [],
+            coverage: {
+                dir: report + 'coverage',
+                reporters: [{
+                        type: 'html',
+                        subdir: 'report-html'
+                    }, {
+                        type: 'lcov',
+                        subdir: 'report-lcov'
+                    }, {
+                        type: 'text-summary'
+                    }
+
+                ]
+            },
+            preprocessors: {
+
+            }
+        };
+        options.preprocessors[clientApp + '**/!(*.spec)+(.js)'] = ['coverage'];
+        return options;
+    }
 };
