@@ -1,10 +1,11 @@
-module.exports = function() {
+module.exports = function () {
     var client = './src/client/',
         clientApp = client + 'app/',
         server = './src/server/',
         temp = './.tmp/',
         root = './',
         report = './report/',
+        specRunnerFile = 'specs.html',
         wiredep = require('wiredep'),
         bowerFiles = wiredep({
             devDependencies: true
@@ -78,6 +79,18 @@ module.exports = function() {
             './package.json',
             './bower.json'
         ],
+        /**
+         * Specs, HTML spec runner
+         */
+        specRunner: client + specRunnerFile,
+        specRunnerFile: specRunnerFile,
+        testLibraries: [
+            'node_modules/mocha/mocha.js',
+            'node_modules/chai/chai.js',
+            'node_modules/mocha-clean/index.js',
+            'node_modules/sinon-chai/lib/sinon-chai.js'
+        ],
+        specs: clientApp + '**/*.spec.js',
 
         /**
          * Karma & testing Settings
@@ -92,7 +105,7 @@ module.exports = function() {
         nodeServer: './src/server/app.js'
     };
 
-    config.getWiredepDefaultOptions = function() {
+    config.getWiredepDefaultOptions = function () {
         var options = {
             bowerJson: config.bower.json,
             directory: config.bower.directory,
