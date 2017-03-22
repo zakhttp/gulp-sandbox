@@ -3,8 +3,10 @@ An environment to fast start development of an AngularJS app usign Gulp task run
 
 ## Installation
 `$ npm install`
+
 `$ bower install`
-`gulp serve-dev`
+
+`$ gulp serve-dev`
 
 ## Tasks
 
