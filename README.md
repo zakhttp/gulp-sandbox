@@ -1,6 +1,11 @@
 # Gulp-Sandbox
 An environment to fast start development of an AngularJS app usign Gulp task runner.
 
+## Installation
+`$ npm install`
+`$ bower install`
+`gulp serve-dev`
+
 ## Tasks
 
 ### Task Listing
