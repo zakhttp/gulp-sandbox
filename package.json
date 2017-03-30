@@ -1,15 +1,15 @@
 {
-  "name": "Pluralsight-Gulp",
+  "name": "gulp-sandbox",
   "version": "0.1.0",
-  "description": "Starter Code for Pluralsight Course JavaScript Build Automation with Gulp.js",
+  "description": "Gulp sandbox for angular projects",
   "authors": [
-    "John Papa"
+    "Zak Ben"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/johnpapa/pluralsight-gulp",
+  "homepage": "https://github.com/zakhttp/gulp-sandbox",
   "repository": {
     "type": "git",
-    "url": "https://github.com/johnpapa/pluralsight-gulp.git"
+    "url": "https://github.com/zakhttp/gulp-sandbox.git"
   },
   "scripts": {
     "init": "npm install",
